@@ -1,7 +1,7 @@
 #include <CL/cl.h>
 #include <iostream>
 
-#include "../common/include/utils.h"
+#include "utils.h"
 
 #define SIZE 1024
 
@@ -19,26 +19,26 @@ const char* kernelSource =
 
 int main() {
     try {
-        cl_uint platformCount = 0;
-        clGetPlatformIDs(0, nullptr, &platformCount);
-
-        if (platformCount == 0) {
-            THROW_EXCEPTION(std::string("platformCount"), std::string("The count of available platforms is zero"));
+        std::vector<cl_platform_id> platforms;
+        cl_uint platformCount = getCountAndListOfPlatforms(platforms);
+        std::vector<std::pair<cl_platform_id, cl_device_id>> gpus, cpus;
+        if (platformCount < 1) {
+            THROW_EXCEPTION(std::string("PlatfromCount"), std::to_string(platformCount))
         }
 
-        cl_platform_id *platforms = new cl_platform_id[platformCount];
-        CONTROL("clGetPlatformIDs", clGetPlatformIDs(platformCount, platforms, nullptr));
+        for (size_t i = 0; i < platformCount; i++) {
+            cl_platform_id platform = platforms[i];
 
-        for (cl_uint i = 0; i < platformCount; ++i) {
-            char platformName[128];
-            CONTROL("clGetPlatformInfo",
-                             clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 128, platformName, nullptr));
+            cl_device_id gpu = getDevice(CL_DEVICE_TYPE_GPU, platform);
+            if (gpu != nullptr)
+                gpus.push_back(std::make_pair(platform, gpu));
 
-            std::cout << "[ INFO ] Platform: " << platformName << std::endl;
+            cl_device_id cpu = getDevice(CL_DEVICE_TYPE_CPU, platform);
+            if (cpu != nullptr)
+                cpus.push_back(std::make_pair(platform, cpu));
         }
 
         cl_platform_id platform = platforms[1];
-        delete[] platforms;
 
         cl_context_properties properties[3] = {
                 CL_CONTEXT_PLATFORM,
@@ -78,7 +78,7 @@ int main() {
 
         float data[SIZE] = {0};
         float results[SIZE] = {0};
-        fillData(data, SIZE);
+        fillData<float>(data, SIZE);
         std::cout << "[ INFO ] results[0] before: " << results[0] << std::endl;
 
         cl_mem input = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float) * SIZE, nullptr, &errorcode);
@@ -95,7 +95,7 @@ int main() {
         CONTROL("clSetSecondKernelArg",
                         clSetKernelArg(kernel, 1, sizeof(cl_mem), &output));
         CONTROL("clSetThirdKernelArg",
-                        clSetKernelArg(kernel, 2, sizeof(size_t), &count));
+                        clSetKernelArg(kernel, 2, sizeof(unsigned int), &count));
 
         size_t group;
         CONTROL("clGetKernelWorkGroupInfo",
@@ -120,8 +120,7 @@ int main() {
 
         return 0;
     }
-    catch (const Exception& ex)
-    {
+    catch (const Exception& ex) {
         std::cout << "[ ERROR ] " << ex.what() << std::endl;
     }
 }
