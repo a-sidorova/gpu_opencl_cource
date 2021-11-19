@@ -1,10 +1,11 @@
 #include "../include/matmul.h"
 
 void matmul(const size_t m, const size_t n, const size_t k, const float* a, const float* b, float* c) {
+    std::memset(c, 0, n * k * sizeof(float));
+
 	for (auto i = 0; i < m; ++i) {
-		for (auto j = 0; j < k; ++j) {
-			c[i * k + j] = 0;
-			for (int l = 0; l < n; ++l) {
+        for (int l = 0; l < n; ++l) {
+		    for (auto j = 0; j < k; ++j) {
 				c[i * k + j] += a[i * n + l] * b[l * k + j];
 			}
 		}
@@ -12,12 +13,12 @@ void matmul(const size_t m, const size_t n, const size_t k, const float* a, cons
 }
 
 void matmul_omp(const size_t m, const size_t n, const size_t k, const float* a, const float* b, float* c) {
-	int i, j, l;
-#pragma omp parallel for private(i, j, l) num_threads(THREADS)
-	for (i = 0; i < static_cast<int>(m); ++i) {
-		for (j = 0; j < static_cast<int>(k); ++j) {
-			c[i * k + j] = 0;
-			for (l = 0; l < static_cast<int>(n); ++l) {
+    std::memset(c, 0, n * k * sizeof(float));
+
+#pragma omp parallel for num_threads(THREADS)
+	for (int i = 0; i < static_cast<int>(m); ++i) {
+        for (int l = 0; l < static_cast<int>(n); ++l) {
+		    for (int j = 0; j < static_cast<int>(k); ++j) {
 				c[i * k + j] += a[i * n + l] * b[l * k + j];
 			}
 		}
@@ -127,7 +128,7 @@ void gemm_cl(const size_t m, const size_t n, const size_t k, const float* a, con
         CONTROL("clGetKernelWorkGroupInf", clGetKernelWorkGroupInfo(kernel, dev_pair.second, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &group, nullptr));
 
         size_t* global = new size_t[2];
-        global[0] = m;
+        global[0] = n;
         global[1] = k;
 
         size_t* local = new size_t[2];
@@ -191,7 +192,7 @@ void gemm_image_cl(const size_t m, const size_t n, const size_t k, const float* 
     CONTROL("clGetKernelWorkGroupInf", clGetKernelWorkGroupInfo(kernel, dev_pair.second, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &group, nullptr));
 
     size_t* global = new size_t[2];
-    global[0] = m;
+    global[0] = n;
     global[1] = k;
 
     size_t* local = new size_t[2];

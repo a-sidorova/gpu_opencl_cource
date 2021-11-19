@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
             matmul_cl(M, N, K, a, b, c, cpus[i], time);
             char name[128];
             clGetDeviceInfo(cpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
-            std::cout << "Time 'GPU' (device " << name << "): " << TIME_MS(time.first, time.second) << std::endl;
+            std::cout << "Time 'CPU' (device " << name << "): " << TIME_MS(time.first, time.second) << std::endl;
             CHECK(FLAG_CHECK, float, c_ref, c, c_size)
         }
     }
@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
             gemm_cl(M, N, K, a, b, c, cpus[i], time);
             char name[128];
             clGetDeviceInfo(cpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
-            std::cout << "Time 'GPU' (device " << name << "): " << TIME_MS(time.first, time.second) << std::endl;
+            std::cout << "Time 'CPU' (device " << name << "): " << TIME_MS(time.first, time.second) << std::endl;
             CHECK(FLAG_CHECK, float, c_ref, c, c_size)
         }
     }
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
             gemm_cl(M, N, K, a, b, c, cpus[i], time);
             char name[128];
             clGetDeviceInfo(cpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
-            std::cout << "Time 'GPU' (device " << name << "): " << TIME_MS(time.first, time.second) << std::endl;
+            std::cout << "Time 'ÑPU' (device " << name << "): " << TIME_MS(time.first, time.second) << std::endl;
             CHECK(FLAG_CHECK, float, c_ref, c, c_size)
         }
     }

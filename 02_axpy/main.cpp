@@ -125,17 +125,17 @@ int main(int argc, char** argv) {
         t1 = std::chrono::high_resolution_clock::now();
         std::cout << "Time 'OMP': " << TIME_MS(t0, t1) << std::endl;
         CHECK(FLAG_CHECK, double, ref, y, y_size)
-
-            // GPU OPENCL
-            for (int i = 0; i < gpus.size(); i++) {
-                fillData<double>(y, y_size);
-                std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point> time;
-                daxpy_cl(n, a, x, inc_x, y, inc_y, gpus[i], time);
-                char name[128];
-                clGetDeviceInfo(gpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
-                std::cout << "Time 'GPU' (device " << name << "): " << TIME_MS(time.first, time.second) << std::endl;
-                CHECK(FLAG_CHECK, double, ref, y, y_size)
-            }
+        
+        // GPU OPENCL
+        for (int i = 0; i < gpus.size(); i++) {
+            fillData<double>(y, y_size);
+            std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point> time;
+            daxpy_cl(n, a, x, inc_x, y, inc_y, gpus[i], time);
+            char name[128];
+            clGetDeviceInfo(gpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
+            std::cout << "Time 'GPU' (device " << name << "): " << TIME_MS(time.first, time.second) << std::endl;
+             CHECK(FLAG_CHECK, double, ref, y, y_size)
+        }
 
         // CPU OPENCL
         for (int i = 0; i < cpus.size(); i++) {

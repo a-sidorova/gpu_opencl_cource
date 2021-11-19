@@ -31,16 +31,19 @@ cl_device_id getDevice(cl_device_type type, cl_platform_id& plfrm_id);
 template <typename T>
 void fillData(T* data, const size_t size) {
     for (int i = 0; i < size; ++i)
-        data[i] = .1f * (i % 10) + 5.f;
+        data[i] = .1f * (i % 10) / 128;
 }
 
 template <typename T>
 bool checkCorrect(T* actual, T* reference, int size) {
-    T eps = 1e-3;
-    bool status = true;
-    for (int i = 0; status && i < size; ++i)
-        status = status && (std::abs(actual[i] - reference[i]) < eps);
-    return status;
+    std::cout << std::fixed;
+    std::cout.precision(10);
+    for (int i = 0; i < size; ++i)
+        if (std::abs(actual[i] - reference[i]) >= std::numeric_limits<T>::epsilon()) {
+            std::cout << "index: " << i << " expected: " << reference[i] << " vs actual: " << actual[i] << std::endl;
+            return false;
+        }
+    return true;
 }
 
 #endif //_GPU_UTILS_H
