@@ -1,8 +1,8 @@
 __kernel void gemm(const unsigned int m, const unsigned int n, const unsigned int k, __global float* a, __global float* b, __global float* c) {
 	const unsigned int i = get_local_id(1);  // n
 	const unsigned int j = get_local_id(0);  // k
-	const unsigned int global_i = BLOCK * get_group_id(1) + i;  // n
-	const unsigned int global_j = BLOCK * get_group_id(0) + j;  // k
+	const unsigned int global_i = get_global_id(1);  // n
+	const unsigned int global_j = get_global_id(0);  // k
 	__local float local_a[BLOCK][BLOCK];
 	__local float local_b[BLOCK][BLOCK];
 	const unsigned int num_tiles = m / BLOCK;
@@ -25,8 +25,8 @@ __kernel void gemm(const unsigned int m, const unsigned int n, const unsigned in
 __kernel void gemm_image(const unsigned int m, const unsigned int n, const unsigned int k, __read_only image2d_t a, __read_only image2d_t b, __write_only image2d_t c) {
 	const unsigned int i = get_local_id(1);  // n
 	const unsigned int j = get_local_id(0);  // k
-	const unsigned int global_i = BLOCK * get_group_id(1) + i;  // n
-	const unsigned int global_j = BLOCK * get_group_id(0) + j;  // k
+	const unsigned int global_i = get_global_id(1);  // n
+	const unsigned int global_j = get_global_id(0);  // k
 	__local float local_a[BLOCK][BLOCK];
 	__local float local_b[BLOCK][BLOCK];
 	const unsigned int num_tiles = m / BLOCK;
