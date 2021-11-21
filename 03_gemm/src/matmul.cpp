@@ -27,7 +27,7 @@ void matmul_omp(const size_t m, const size_t n, const size_t k, const float* a, 
 
 void matmul_cl(const size_t m, const size_t n, const size_t k, const float* a, const float* b, float* c,
 	std::pair<cl_platform_id, cl_device_id>& dev_pair,
-	std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point>& time) {
+	timer& time) {
     cl_int error = CL_SUCCESS;
     cl_context_properties properties[3] = { CL_CONTEXT_PLATFORM, (cl_context_properties)dev_pair.first, 0 };
 
@@ -89,8 +89,7 @@ void matmul_cl(const size_t m, const size_t n, const size_t k, const float* a, c
 }
 
 void gemm_cl(const size_t m, const size_t n, const size_t k, const float* a, const float* b, float* c,
-    std::pair<cl_platform_id, cl_device_id>& dev_pair,
-    std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point>& time) {
+    std::pair<cl_platform_id, cl_device_id>& dev_pair, timer& time) {
         cl_int error = CL_SUCCESS;
         cl_context_properties properties[3] = { CL_CONTEXT_PLATFORM, (cl_context_properties)dev_pair.first, 0 };
 
@@ -153,8 +152,7 @@ void gemm_cl(const size_t m, const size_t n, const size_t k, const float* a, con
 }
 
 void gemm_image_cl(const size_t m, const size_t n, const size_t k, const float* a, const float* b, float* c,
-    std::pair<cl_platform_id, cl_device_id>& dev_pair,
-    std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point>& time) {
+    std::pair<cl_platform_id, cl_device_id>& dev_pair, timer& time) {
     cl_int error = CL_SUCCESS;
     cl_context_properties properties[3] = { CL_CONTEXT_PLATFORM, (cl_context_properties)dev_pair.first, 0 };
 

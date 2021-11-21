@@ -84,3 +84,12 @@ cl_device_id getDevice(cl_device_type type, cl_platform_id& plfrm_id) {
     }
     return nullptr;
 }
+
+size_t getTheClosestBiggerDegreeOf2(const size_t x) {
+    size_t degree = 1;
+    while (true) {
+        if (degree >= x) return degree;
+        degree *= 2;
+    }
+    return 0;
+}

@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 
         // CL GPU
         for (int i = 0; i < gpus.size(); i++) {
-            std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point> time;
+            timer time;
             matmul_cl(M, N, K, a, b, c, gpus[i], time);
             char name[128];
             clGetDeviceInfo(gpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 
         // CL ÑPU
         for (int i = 0; i < cpus.size(); i++) {
-            std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point> time;
+            timer time;
             matmul_cl(M, N, K, a, b, c, cpus[i], time);
             char name[128];
             clGetDeviceInfo(cpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
     try {
         // CL GPU
         for (int i = 0; i < gpus.size(); i++) {
-            std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point> time;
+            timer time;
             gemm_cl(M, N, K, a, b, c, gpus[i], time);
             char name[128];
             clGetDeviceInfo(gpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
 
         // CL ÑPU
         for (int i = 0; i < cpus.size(); i++) {
-            std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point> time;
+            timer time;
             gemm_cl(M, N, K, a, b, c, cpus[i], time);
             char name[128];
             clGetDeviceInfo(cpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
     try {
         // CL GPU
         for (int i = 0; i < gpus.size(); i++) {
-            std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point> time;
+            timer time;
             gemm_cl(M, N, K, a, b, c, gpus[i], time);
             char name[128];
             clGetDeviceInfo(gpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
 
         // CL ÑPU
         for (int i = 0; i < cpus.size(); i++) {
-            std::pair<std::chrono::high_resolution_clock::time_point, std::chrono::high_resolution_clock::time_point> time;
+            timer time;
             gemm_cl(M, N, K, a, b, c, cpus[i], time);
             char name[128];
             clGetDeviceInfo(cpus[i].second, CL_DEVICE_NAME, 128, name, nullptr);
