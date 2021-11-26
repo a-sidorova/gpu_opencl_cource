@@ -88,7 +88,7 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
 
     if (accuracy < EPS)
         std::cout << "[ INFO ] Accuracy (" << accuracy << ") is achieved (iters: " << iters << ")" << std::endl;
-    else if (iters > MAX_ITERS)
+    else if (iters >= MAX_ITERS)
         std::cout << "[ INFO ] Accuracy isn't achieved (" << accuracy << "), count of iterations is exceeded" << std::endl;
 
     clReleaseMemObject(a_buffer);

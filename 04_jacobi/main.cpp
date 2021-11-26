@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
             << "\tGPU OPENCL" << std::endl
             << "===========================" << std::endl;
         for (size_t i = 0; i < gpus.size(); i++) {
-            fillData(x0, SIZE);
+            generateVector(x0, SIZE);
             std::memset(norm, 0, sizeof(float) * SIZE);
             std::memset(x1, 0, sizeof(float) * SIZE);
 
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
             << "\tCPU OPENCL" << std::endl
             << "===========================" << std::endl;
         for (size_t i = 0; i < cpus.size(); i++) {
-            fillData(x0, SIZE);
+            generateVector(x0, SIZE);
             std::memset(norm, 0, sizeof(float) * SIZE);
             std::memset(x1, 0, sizeof(float) * SIZE);
 

@@ -41,6 +41,15 @@ void fillData(T* data, const size_t size) {
 }
 
 template <typename T>
+void generateVector(T* data, const size_t size) {
+    static std::random_device rd;
+    static std::default_random_engine re(rd());
+    static std::uniform_real_distribution<T> dist{ 2.f, 3.f };
+    for (int i = 0; i < size; ++i)
+        data[i] = dist(rd);
+}
+
+template <typename T>
 void generateSymmetricPositiveMatrix(T* matrix, int size) {
     static std::random_device rd;
     static std::default_random_engine re(rd());

@@ -3,7 +3,7 @@
 
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #define MAX_ITERS 10000
-#define EPS  1e-6
+#define EPS  1e-5
 
 #include <vector>
 #include "CL/cl.h"
