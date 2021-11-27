@@ -67,8 +67,8 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
 
         accuracy = std::numeric_limits<float>::min();
         for (size_t i = 0; i < size; ++i) {
-            if ((fabs(norm[i]) / fabs(x1[i])) > accuracy)
-                accuracy = (fabs(norm[i]) / fabs(x1[i]));
+            if (fabs(norm[i] / x0[i]) > accuracy)
+                accuracy = fabs(norm[i] / x0[i]);
         }
         iters++;
 

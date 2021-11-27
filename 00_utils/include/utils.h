@@ -94,8 +94,8 @@ void checkSolutionOfSOLE(const size_t size, const T* A, const T* b, const T* x, 
 
     float accuracy = std::numeric_limits<float>::min();
     for (size_t i = 0; i < size; ++i) {
-        if (fabs(actual[i] - b[i]) > accuracy)
-            accuracy = fabs(actual[i] - b[i]);
+        if (fabs((actual[i] - b[i]) / b[i]) > accuracy)
+            accuracy = fabs((actual[i] - b[i]) / b[i]);
     }
     const bool result = accuracy <= eps;
     std::cout << "[ CHECK ]  EPS - Achieved: " << accuracy << "\t" << "EPS - Expected: " << eps << std::endl;

@@ -2,7 +2,7 @@
 #define _GPU_JACOBI_H_
 
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
-#define MAX_ITERS 10000
+#define MAX_ITERS 50000
 #define EPS  1e-5
 
 #include <vector>

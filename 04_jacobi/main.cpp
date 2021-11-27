@@ -8,7 +8,7 @@
 #include "utils.h"
 
 #define FLAG_CHECK true
-#define SIZE 1024
+#define SIZE 2048
 
 int main(int argc, char** argv) {
     std::vector<cl_platform_id> platforms;
@@ -36,13 +36,15 @@ int main(int argc, char** argv) {
     float* x0 = new float[SIZE];
     float* x1 = new float[SIZE];
     float* norm = new float[SIZE];
+    float* tmp = new float[SIZE];
     cl_ulong kernel_time = 0;
     timer time;
 
     // System of equations
     generateSymmetricPositiveMatrix(a, SIZE);
-    fillData(b, SIZE);
+    generateVector(b, SIZE);
     printSystem(a, b, SIZE);
+    generateVector(tmp, SIZE);
 
     // GPU OPENCL
     try {
@@ -50,7 +52,7 @@ int main(int argc, char** argv) {
             << "\tGPU OPENCL" << std::endl
             << "===========================" << std::endl;
         for (size_t i = 0; i < gpus.size(); i++) {
-            generateVector(x0, SIZE);
+            std::memcpy(x0, tmp, SIZE * sizeof(float));
             std::memset(norm, 0, sizeof(float) * SIZE);
             std::memset(x1, 0, sizeof(float) * SIZE);
 
@@ -64,6 +66,7 @@ int main(int argc, char** argv) {
                 "-- only kernel: " << kernel_time * 1e-06 << " ms" << std::endl;
             if (FLAG_CHECK)
                 checkSolutionOfSOLE(SIZE, a, b, x1, EPS);
+            std::cout << std::endl;
         }
     } catch (Exception& exception) {
         std::cout << exception.what() << std::endl;
@@ -75,7 +78,7 @@ int main(int argc, char** argv) {
             << "\tCPU OPENCL" << std::endl
             << "===========================" << std::endl;
         for (size_t i = 0; i < cpus.size(); i++) {
-            generateVector(x0, SIZE);
+            std::memcpy(x0, tmp, SIZE * sizeof(float));
             std::memset(norm, 0, sizeof(float) * SIZE);
             std::memset(x1, 0, sizeof(float) * SIZE);
 
@@ -89,6 +92,7 @@ int main(int argc, char** argv) {
                 "-- only kernel: " << kernel_time * 1e-06 << " ms" << std::endl;
             if (FLAG_CHECK)
                 checkSolutionOfSOLE(SIZE, a, b, x1, EPS);
+            std::cout << std::endl;
         }
     } catch (Exception& exception) {
         std::cout << exception.what() << std::endl;
@@ -99,6 +103,7 @@ int main(int argc, char** argv) {
     delete[] x0;
     delete[] x1;
     delete[] norm;
+    delete[] tmp;
 
     return 0;
 }
