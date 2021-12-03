@@ -127,8 +127,8 @@ void gemm_cl(const size_t m, const size_t n, const size_t k, const float* a, con
         CONTROL("clGetKernelWorkGroupInf", clGetKernelWorkGroupInfo(kernel, dev_pair.second, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &group, nullptr));
 
         size_t* global = new size_t[2];
-        global[0] = n;
-        global[1] = k;
+        global[0] = k;
+        global[1] = m;
 
         size_t* local = new size_t[2];
         local[0] = static_cast<size_t>(BLOCK);
