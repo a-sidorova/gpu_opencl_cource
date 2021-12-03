@@ -15,9 +15,9 @@ void gemm_cl(const size_t m, const size_t n, const size_t k, const float* a, con
 	std::pair<cl_platform_id, cl_device_id>& cpu_dev_pair, std::pair<cl_platform_id, cl_device_id>& gpu_dev_pair,
 	timer& time, const size_t gpu_m);
 
-void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size, cl_device_type device_type,
+void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
 	std::pair<cl_platform_id, cl_device_id>& cpu_dev_pair, std::pair<cl_platform_id, cl_device_id>& gpu_dev_pair, timer& time,
-	std::pair<cl_ulong, cl_ulong>& kernel_time, const size_t gpu_m);
+	cl_ulong& kernel_time, const int gpu_m);
 
 
 #endif // _GPU_HETERO_ALGORITHM_H_
