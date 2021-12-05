@@ -6,11 +6,12 @@ This repository stores laboratory works of Programming on new Architecture-1 (GP
 *Tools*: OpenCL
 
 ### Structure
-1. 00_utils - *Static library: Common utilities for all labs: creattion kernels from .cl files, getting platfroms and devices, checks for correct calculations, etc.*
+1. 00_utils - *Static library: Common utilities for all labs: creation kernels from .cl files, getting platfroms and devices, checks for correct calculations, etc.*
 2. 01_hello_world - *First lab: Print thread info and addition of src data and global ID of thread.*
 3. 02_axpy - *Second lab: Create function analogues of `axpy` function from BLASS library: `saxpy` for float and `daxpy` for double.*
-4. 03_gemm - *Third lab: Matrix Blocked Multiplication (GEMM)*
+4. 03_gemm - *Third lab: Matrix Blocked Multiplication (GEMM).*
 5. 04_jacobi - *Fourth lab: the Jacobi method is an iterative algorithm for determining the solutions of a strictly diagonally dominant system of linear equations.*
+6. 05_hetero - *Fifth lab: Heterogeneous computing implementation for GEMM and Jacobi method from 3th and 4th labs.*
 
 
 © Copyright Sidorova Alexandra, 2021
