@@ -86,12 +86,10 @@ void gemm_cl(const size_t m, const size_t n, const size_t k, const float* a, con
     if (gpu_m > 0) {
         CONTROL("clEnqueueNDRangeKernel", clEnqueueNDRangeKernel(gpu_queue, gpu_kernel, ndims, nullptr, global, local, 0, nullptr, nullptr));
     }
-   //CONTROL("clFlush GPU", clFlush(gpu_queue));
     if (cpu_m > 0) {
         global[1] = cpu_m;
         CONTROL("clEnqueueNDRangeKernel", clEnqueueNDRangeKernel(cpu_queue, cpu_kernel, ndims, nullptr, global, local, 0, nullptr, nullptr));
     }
-    //CONTROL("clFlush CPU", clFlush(cpu_queue));
     CONTROL("clFinish", clFinish(gpu_queue));
     CONTROL("clFinish", clFinish(cpu_queue));
     time.second = std::chrono::high_resolution_clock::now();
@@ -154,7 +152,7 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
         CONTROL("clCreateBuffer A", error);
         gpu_b_buffer = clCreateBuffer(gpu_context, CL_MEM_READ_ONLY, sizeof(float) * gpu_m, nullptr, &error);
         CONTROL("clCreateBuffer B", error);
-        gpu_x0_buffer = clCreateBuffer(gpu_context, CL_MEM_READ_WRITE, sizeof(float) * gpu_m, nullptr, &error);
+        gpu_x0_buffer = clCreateBuffer(gpu_context, CL_MEM_READ_WRITE, sizeof(float) * size, nullptr, &error);
         CONTROL("clCreateBuffer X0", error);
         gpu_x1_buffer = clCreateBuffer(gpu_context, CL_MEM_READ_WRITE, sizeof(float) * gpu_m, nullptr, &error);
         CONTROL("clCreateBuffer X1", error);
@@ -163,7 +161,7 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
 
         CONTROL("clEnqueueWriteBuffer A", clEnqueueWriteBuffer(gpu_queue, gpu_a_buffer, CL_TRUE, 0, sizeof(float) * size * size, a, 0, nullptr, nullptr));
         CONTROL("clEnqueueWriteBuffer B", clEnqueueWriteBuffer(gpu_queue, gpu_b_buffer, CL_TRUE, 0, sizeof(float) * gpu_m, b, 0, nullptr, nullptr));
-        CONTROL("clEnqueueWriteBuffer X0", clEnqueueWriteBuffer(gpu_queue, gpu_x0_buffer, CL_TRUE, 0, sizeof(float) * gpu_m, x0, 0, nullptr, nullptr));
+        CONTROL("clEnqueueWriteBuffer X0", clEnqueueWriteBuffer(gpu_queue, gpu_x0_buffer, CL_TRUE, 0, sizeof(float) * size, x0, 0, nullptr, nullptr));
         CONTROL("clEnqueueWriteBuffer X1", clEnqueueWriteBuffer(gpu_queue, gpu_x1_buffer, CL_TRUE, 0, sizeof(float) * gpu_m, x1, 0, nullptr, nullptr));
         CONTROL("clEnqueueWriteBuffer NORM", clEnqueueWriteBuffer(gpu_queue, gpu_norm_buffer, CL_TRUE, 0, sizeof(float) * gpu_m, norm, 0, nullptr, nullptr));
 
@@ -172,18 +170,19 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
         CONTROL("clSetKernelArg X0", clSetKernelArg(gpu_kernel, 2, sizeof(cl_mem), &gpu_x0_buffer));
         CONTROL("clSetKernelArg X1", clSetKernelArg(gpu_kernel, 3, sizeof(cl_mem), &gpu_x1_buffer));
         CONTROL("clSetKernelArg NORM", clSetKernelArg(gpu_kernel, 4, sizeof(cl_mem), &gpu_norm_buffer));
-        CONTROL("clSetKernelArg size", clSetKernelArg(gpu_kernel, 5, sizeof(unsigned int), &gpu_m));
+        CONTROL("clSetKernelArg size", clSetKernelArg(gpu_kernel, 5, sizeof(unsigned int), &size));
         CONTROL("clSetKernelArg size", clSetKernelArg(gpu_kernel, 6, sizeof(unsigned int), &stride));
         CONTROL("clGetKernelWorkGroupInf", clGetKernelWorkGroupInfo(gpu_kernel, gpu_dev_pair.second, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &gpu_group_size, nullptr));
         gpu_global_size = (gpu_m % gpu_group_size == 0) ? gpu_m : gpu_m + gpu_group_size - gpu_m % gpu_group_size;
     }
 
     if (cpu_m > 0) {
+        const size_t stride = gpu_m;
         cpu_a_buffer = clCreateBuffer(cpu_context, CL_MEM_READ_ONLY, sizeof(float) * size * size, nullptr, &error);
         CONTROL("clCreateBuffer A", error);
         cpu_b_buffer = clCreateBuffer(cpu_context, CL_MEM_READ_ONLY, sizeof(float) * cpu_m, nullptr, &error);
         CONTROL("clCreateBuffer B", error);
-        cpu_x0_buffer = clCreateBuffer(cpu_context, CL_MEM_READ_WRITE, sizeof(float) * cpu_m, nullptr, &error);
+        cpu_x0_buffer = clCreateBuffer(cpu_context, CL_MEM_READ_WRITE, sizeof(float) * size, nullptr, &error);
         CONTROL("clCreateBuffer X0", error);
         cpu_x1_buffer = clCreateBuffer(cpu_context, CL_MEM_READ_WRITE, sizeof(float) * cpu_m, nullptr, &error);
         CONTROL("clCreateBuffer X1", error);
@@ -192,7 +191,7 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
 
         CONTROL("clEnqueueWriteBuffer A", clEnqueueWriteBuffer(cpu_queue, cpu_a_buffer, CL_TRUE, 0, sizeof(float) * size * size, a, 0, nullptr, nullptr));
         CONTROL("clEnqueueWriteBuffer B", clEnqueueWriteBuffer(cpu_queue, cpu_b_buffer, CL_TRUE, 0, sizeof(float) * cpu_m, &b[gpu_m], 0, nullptr, nullptr));
-        CONTROL("clEnqueueWriteBuffer X0", clEnqueueWriteBuffer(cpu_queue, cpu_x0_buffer, CL_TRUE, 0, sizeof(float) * cpu_m, &x0[gpu_m], 0, nullptr, nullptr));
+        CONTROL("clEnqueueWriteBuffer X0", clEnqueueWriteBuffer(cpu_queue, cpu_x0_buffer, CL_TRUE, 0, sizeof(float) * size, x0, 0, nullptr, nullptr));
         CONTROL("clEnqueueWriteBuffer X1", clEnqueueWriteBuffer(cpu_queue, cpu_x1_buffer, CL_TRUE, 0, sizeof(float) * cpu_m, &x1[gpu_m], 0, nullptr, nullptr));
         CONTROL("clEnqueueWriteBuffer NORM", clEnqueueWriteBuffer(cpu_queue, cpu_norm_buffer, CL_TRUE, 0, sizeof(float) * cpu_m, &norm[gpu_m], 0, nullptr, nullptr));
 
@@ -201,8 +200,8 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
         CONTROL("clSetKernelArg X0", clSetKernelArg(cpu_kernel, 2, sizeof(cl_mem), &cpu_x0_buffer));
         CONTROL("clSetKernelArg X1", clSetKernelArg(cpu_kernel, 3, sizeof(cl_mem), &cpu_x1_buffer));
         CONTROL("clSetKernelArg NORM", clSetKernelArg(cpu_kernel, 4, sizeof(cl_mem), &cpu_norm_buffer));
-        CONTROL("clSetKernelArg size", clSetKernelArg(cpu_kernel, 5, sizeof(unsigned int), &cpu_m));
-        CONTROL("clSetKernelArg size", clSetKernelArg(cpu_kernel, 6, sizeof(unsigned int), &gpu_m));
+        CONTROL("clSetKernelArg size", clSetKernelArg(cpu_kernel, 5, sizeof(unsigned int), &size));
+        CONTROL("clSetKernelArg stride", clSetKernelArg(cpu_kernel, 6, sizeof(unsigned int), &stride));
         CONTROL("clGetKernelWorkGroupInf", clGetKernelWorkGroupInfo(cpu_kernel, cpu_dev_pair.second, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &cpu_group_size, nullptr));
         cpu_global_size = (cpu_m % cpu_group_size == 0) ? cpu_m : cpu_m + cpu_group_size - cpu_m % cpu_group_size;
     }
@@ -227,17 +226,20 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
             CONTROL("clWaitForEvents", clWaitForEvents(1, &cpu_evt));
         }
 
+        cl_ulong gpu_kernel_time = 0, cpu_kernel_time = 0;
         cl_ulong evt_start_time = 0, evt_end_time = 0;
         if (gpu_m > 0) {
             CONTROL("clGetEventProfilingInfo Start", clGetEventProfilingInfo(gpu_evt, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &evt_start_time, nullptr));
             CONTROL("clGetEventProfilingInfo End", clGetEventProfilingInfo(gpu_evt, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &evt_end_time, nullptr));
-            kernel_time += evt_end_time - evt_start_time;
+            gpu_kernel_time = evt_end_time - evt_start_time;
         }
         if (cpu_m > 0) {
             CONTROL("clGetEventProfilingInfo Start", clGetEventProfilingInfo(cpu_evt, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &evt_start_time, nullptr));
             CONTROL("clGetEventProfilingInfo End", clGetEventProfilingInfo(cpu_evt, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &evt_end_time, nullptr));
-            kernel_time += evt_end_time - evt_start_time;
+            cpu_kernel_time = evt_end_time - evt_start_time;
         }
+
+        kernel_time += std::max(gpu_kernel_time, cpu_kernel_time);
 
         if (gpu_m > 0) {
             CONTROL("clEnqueueReadBuffer X1", clEnqueueReadBuffer(gpu_queue, gpu_x1_buffer, CL_TRUE, 0, sizeof(float) * gpu_m, x1, 0, NULL, NULL));
@@ -250,7 +252,7 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
 
         accuracy = std::numeric_limits<float>::min();
         for (size_t i = 0; i < size; ++i) {
-            if (fabs(norm[i] / x0[i]) > accuracy)
+            if (fabs(norm[i] / x0[i]) > accuracy || x0[i] != 0)
                 accuracy = fabs(norm[i] / x0[i]);
         }
         iters++;
@@ -261,10 +263,10 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
             break;
 
         if (gpu_m > 0) {
-            CONTROL("clEnqueueWriteBuffer X0", clEnqueueWriteBuffer(gpu_queue, gpu_x0_buffer, CL_TRUE, 0, sizeof(float) * gpu_m, x0, 0, NULL, NULL));
+            CONTROL("clEnqueueWriteBuffer X0", clEnqueueWriteBuffer(gpu_queue, gpu_x0_buffer, CL_TRUE, 0, sizeof(float) * size, x0, 0, NULL, NULL));
         }
         if (cpu_m > 0) {
-            CONTROL("clEnqueueWriteBuffer X0", clEnqueueWriteBuffer(cpu_queue, cpu_x0_buffer, CL_TRUE, 0, sizeof(float) * cpu_m, &x0[gpu_m], 0, NULL, NULL));
+            CONTROL("clEnqueueWriteBuffer X0", clEnqueueWriteBuffer(cpu_queue, cpu_x0_buffer, CL_TRUE, 0, sizeof(float) * size, x0, 0, NULL, NULL));
         }
     }
     time.second = std::chrono::high_resolution_clock::now();
@@ -282,7 +284,6 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
         std::cout << "[ INFO ] Accuracy isn't achieved (" << accuracy << "), count of iterations is exceeded" << std::endl;
 
     if (gpu_m > 0) {
-        CONTROL("clEnqueueReadBuffer X1", clEnqueueReadBuffer(gpu_queue, gpu_x1_buffer, CL_TRUE, 0, sizeof(float)* gpu_m, x1, 0, NULL, NULL));
         clReleaseMemObject(gpu_a_buffer);
         clReleaseMemObject(gpu_b_buffer);
         clReleaseMemObject(gpu_x0_buffer);
@@ -290,7 +291,6 @@ void jacobi_cl(float* a, float* b, float* x0, float* x1, float* norm, int size,
         clReleaseMemObject(gpu_norm_buffer);
     }
     if (cpu_m > 0) {
-        CONTROL("clEnqueueReadBuffer X1", clEnqueueReadBuffer(cpu_queue, cpu_x1_buffer, CL_TRUE, 0, sizeof(float)* cpu_m, &x1[gpu_m], 0, NULL, NULL));
         clReleaseMemObject(cpu_a_buffer);
         clReleaseMemObject(cpu_b_buffer);
         clReleaseMemObject(cpu_x0_buffer);
